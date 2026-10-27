@@ -1,0 +1,45 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "e8b8e646d8b3d69d38a7630616005295"
+application_url = "https://example.com"
+embedded = true
+name = "My-stockwatch-project"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+# Read-only: we never change products, stock or the theme.
+scopes = "read_products,read_inventory,read_themes"
+
+
+[webhooks]
+api_version = "2027-01"
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/app/uninstalled"
+  topics = [ "app/uninstalled" ]
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/app/scopes_update"
+  topics = [ "app/scopes_update" ]
+
+  # Sale, restock, manual edit, POS... any stock change.
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/inventory/update"
+  topics = [ "inventory_levels/update" ]
+
+  # "Sync all" bulk operation finished.
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/bulk/finish"
+  topics = [ "bulk_operations/finish" ]
+
+  # Mandatory privacy webhooks.
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/compliance"
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
+
+[auth]
+redirect_urls = [ "https://example.com/api/auth" ]
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true

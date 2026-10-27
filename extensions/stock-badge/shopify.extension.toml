@@ -1,0 +1,7 @@
+api_version = "2026-07"
+
+[[extensions]]
+name = "Stockwatch message"
+handle = "stock-badge"
+uid = "e2252540-ed7b-338b-71ba-cb268c53665191c2e1e0"
+type = "theme"

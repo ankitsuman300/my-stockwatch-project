@@ -1,0 +1,20 @@
+Stride Street Skate Low UK5 : 2
+Stride Street Skate Low UK6 : 5
+Stride Street Skate Low UK7 : 7
+
+Stride Platform : UK3 : 0
+Stride Platform : UK4 : 1
+Stride Platform : UK5 : 2
+
+Stride Cozy House : UK5 : 0
+Stride Cozy House : UK6 : 1
+Stride Cozy House : UK7 : 4
+Stride Cozy House : UK8 : 5
+
+Stride Leather Chelsea Boot : UK6 : 0
+Stride Leather Chelsea Boot : UK7 : 1
+Stride Leather Chelsea Boot : UK8 : 6
+
+Stride Metro Knit : UK5 : 0
+Stride Metro Knit : UK6 : 1
+Stride Metro Knit : UK7 : 6

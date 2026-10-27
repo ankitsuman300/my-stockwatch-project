@@ -1,0 +1,113 @@
+{% comment %} {%- comment -%}
+  Stockwatch low-stock message.
+  Plain text: it uses the theme's own font and colour, and adds no CSS.
+  Maya sets the threshold and the messages right here in the theme editor,
+  so there is no metafield and nothing in our database.
+  Rendered by Shopify on the server with the live stock: no API calls.
+{%- endcomment -%}
+
+{%- liquid
+  assign threshold = block.settings.threshold | plus: 0
+  if threshold < 1 or threshold > 100
+    assign threshold = 5
+  endif
+
+  assign message_singular = block.settings.message_singular | strip_html | strip | truncate: 80, ''
+  if message_singular == blank
+    assign message_singular = 'Only {count} left!'
+  endif
+
+  assign message_plural = block.settings.message_plural | strip_html | strip | truncate: 80, ''
+  unless message_plural contains '{count}'
+    assign message_plural = 'Only {count} left!'
+  endunless
+
+  assign selected = product.selected_or_first_available_variant
+-%}
+
+{%- capture variant_counts -%}
+  {
+  {%- for variant in product.variants -%}
+    {%- comment -%}
+      Only reveal the number for variants that are actually low.
+      Untracked items and "keep selling when out of stock" never show the message.
+    {%- endcomment -%}
+
+    {%- assign qty = variant.inventory_quantity -%}
+    {%- if variant.inventory_management == 'shopify' and variant.inventory_policy == 'deny' and qty >= 1 and qty <= threshold -%}
+      "{{ variant.id }}": {{ qty }}
+    {%- else -%}
+      "{{ variant.id }}": null
+    {%- endif -%}
+    {%- unless forloop.last -%},{%- endunless -%}
+  {%- endfor -%}
+  }
+{%- endcapture -%}
+
+{%- liquid
+  assign selected_qty = 0
+  if selected.inventory_management == 'shopify' and selected.inventory_policy == 'deny'
+    assign selected_qty = selected.inventory_quantity
+  endif
+
+  if selected_qty == 1
+    assign initial_message = message_singular
+  else
+    assign initial_message = message_plural
+  endif
+  assign initial_message = initial_message | escape | replace: '{count}', selected_qty
+-%}
+
+<p
+  data-stockwatch
+  {% unless selected_qty >= 1 and selected_qty <= threshold %}style="display: none"{% endunless %}
+  {{ block.shopify_attributes }}
+>
+  <span data-stockwatch-text>{{ initial_message }}</span>
+  <script type="application/json" data-stockwatch-data>
+    {
+      "singular": {{ message_singular | json }},
+      "plural": {{ message_plural | json }},
+      "variants": {{ variant_counts }}
+    }
+  </script>
+</p>
+
+{% comment %}
+  Keep these defaults the same as DEFAULT_CONFIG in app/lib/config.js,
+  because the app falls back to those when a setting was never saved.
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Low stock message",
+  "target": "section",
+  "enabled_on": { "templates": ["product"] },
+  "javascript": "stock-badge.js",
+  "settings": [
+    {
+      "type": "range",
+      "id": "threshold",
+      "label": "Show when stock is at or below",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "text",
+      "id": "message_singular",
+      "label": "Message when 1 is left",
+      "default": "Only {count} left!",
+      "info": "Example: Last one left!"
+    },
+    {
+      "type": "text",
+      "id": "message_plural",
+      "label": "Message when 2 or more are left",
+      "default": "Only {count} left!",
+      "info": "Must include {count}. It is replaced by the number left."
+    }
+  ]
+}
+{% endschema %} {% endcomment %}
